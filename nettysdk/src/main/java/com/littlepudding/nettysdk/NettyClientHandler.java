@@ -50,6 +50,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler {
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
+        Log.e(TAG, "userEventTriggered: ");
         if (evt instanceof IdleStateEvent) {
             IdleStateEvent idleStateEvent = (IdleStateEvent) evt;
             Log.d(TAG, "userEventTriggered: status: " + idleStateEvent.state().name());
@@ -87,6 +88,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
+        Log.e(TAG, "channelActive: " );
         SocketChannel activeSocketChannel = (SocketChannel) ctx.channel();
         if (iInitializeData.getChannelActivieMessage() != null && iInitializeData.getChannelActivieMessage().getData() != null) {
             if (iInitializeData.getAggrement() == ConnectionAggrement.STRING) {

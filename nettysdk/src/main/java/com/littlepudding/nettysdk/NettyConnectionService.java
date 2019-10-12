@@ -110,6 +110,7 @@ public class NettyConnectionService implements IConnectionService {
                 @Override
                 public void accept(Throwable throwable) throws Exception {
                     connect();
+                    throwable.printStackTrace();
                 }
             });
         } catch (Exception e) {

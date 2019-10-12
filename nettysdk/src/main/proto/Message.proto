@@ -1,5 +1,7 @@
 syntax = "proto3";
-option java_package = "com.littlepudding.nettysdk.protobuf";
+//option java_package = "com.littlepudding.nettysdk.protobuf";
+//option java_outer_classname = "MyMessage";
+option java_package = "com.carplusgo.commonbase.protobuf";
 option java_outer_classname = "CarplusgoMessage";
 
 //消息类型
