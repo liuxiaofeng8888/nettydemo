@@ -10,6 +10,8 @@ import com.littlepudding.nettysdk.model.ISendMessage;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -48,8 +50,9 @@ public class NettyConnectionService implements IConnectionService {
     private ArrayList<IConnectionListener> connectionListeners;
     private Gson gson;
     private LinkedBlockingQueue<ISendMessage> messageQueue;
-    private Thread sendThread;
+    //    private Thread sendThread;
     private IInitializeData iInitializeData;
+    private ExecutorService service;
 
     @Override
     public void create(String host, int port, IInitializeData iInitializeData) {
@@ -83,9 +86,9 @@ public class NettyConnectionService implements IConnectionService {
             createBootstrap(iInitializeData);
         }
 
-        if (sendThread != null && !sendThread.isAlive()) {
-            createSendThread();
-        }
+//        if (sendThread != null && !sendThread.isAlive()) {
+//            createSendThread();
+//        }
         try {
             Observable.timer(3, TimeUnit.SECONDS).subscribeOn(Schedulers.io()).subscribe(new Consumer<Long>() {
                 @Override
@@ -132,7 +135,8 @@ public class NettyConnectionService implements IConnectionService {
         nettyClientHandler.destroy();
         bootstrap = null;
         nettyClientHandler = null;
-        sendThread.interrupt();
+//        sendThread.interrupt();
+        service.shutdown();
     }
 
     @Override
@@ -206,10 +210,8 @@ public class NettyConnectionService implements IConnectionService {
      * 创建发送消息的线程池
      */
     private void createSendThread() {
-        if (sendThread != null) {
-            sendThread.interrupt();
-        }
-        sendThread = new Thread(new Runnable() {
+        service = Executors.newFixedThreadPool(1);
+        service.submit(new Runnable() {
             @Override
             public void run() {
                 ISendMessage message = null;
@@ -238,7 +240,39 @@ public class NettyConnectionService implements IConnectionService {
                 }
             }
         });
-        sendThread.start();
+//        if (sendThread != null) {
+//            sendThread.interrupt();
+//        }
+//        sendThread = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                ISendMessage message = null;
+//                while (true) {
+//                    message = messageQueue.poll();
+//                    boolean isSendSuccess = false;
+//                    try {
+//                        while (!isSendSuccess && message != null) {
+//                            if (socketChannel != null) {
+//                                if (iInitializeData.getAggrement() == ConnectionAggrement.STRING) {
+//                                    if (message.getData() instanceof String) {
+//                                        isSendSuccess = socketChannel.writeAndFlush((String) message.getData()).await(3000);
+//                                    } else {
+//                                        isSendSuccess = socketChannel.writeAndFlush(gson.toJson(message.getData())).await(3000);
+//                                    }
+//                                } else if (iInitializeData.getAggrement() == ConnectionAggrement.JSON) {
+//                                    isSendSuccess = socketChannel.writeAndFlush(gson.toJson(message.getData())).await(3000);
+//                                } else if (iInitializeData.getAggrement() == ConnectionAggrement.PROTOBUF) {
+//                                    isSendSuccess = socketChannel.writeAndFlush(message.getData()).await(3000);
+//                                }
+//                            }
+//                        }
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//        });
+//        sendThread.start();
     }
 
 }
