@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements IConnectionListen
 
 
     private void createConnection() {
+
         iConnectionService = new NettyConnectionService();
         iInitializeData = new IInitializeData() {
             @Override
